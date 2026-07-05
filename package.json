@@ -1,0 +1,37 @@
+{
+  "name": "llm-conductor",
+  "version": "1.0.0",
+  "description": "LLM/AI Prompt Manager Library",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "vitest run",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["llm", "ai", "prompt", "builder", "chain", "zod"],
+  "author": "",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.2.0",
+    "typescript": "~5.6.3",
+    "vitest": "^2.0.0"
+  }
+}
