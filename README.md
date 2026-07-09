@@ -2,6 +2,14 @@
 
 A lightweight, unified, and type-safe wrapper for managing prompts, chat history, and structured outputs across multiple LLM providers.
 
+## Project Snapshot
+
+LLM Conductor is a TypeScript library for building provider-agnostic LLM flows with conversation history and Zod-backed structured output. It is positioned for AI product work where OpenAI, Anthropic, and Gemini should be swappable behind one developer-facing API.
+
+- **Core idea:** one fluent interface for chat, history, schemas, and provider-specific structured output behavior.
+- **Recent hardening:** schema conversion now fails loudly when the installed Zod version cannot expose JSON Schema conversion instead of silently returning an empty schema.
+- **Validation:** `npm test` and `npm run build`.
+
 [Türkçe açıklamalar için aşağı kaydırın.](#türkçe)
 
 ---
