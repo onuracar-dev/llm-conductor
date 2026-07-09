@@ -1,7 +1,7 @@
 {
   "name": "llm-conductor",
   "version": "1.0.0",
-  "description": "LLM/AI Prompt Manager Library",
+  "description": "Type-safe orchestration for multi-provider LLM workflows.",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -18,8 +18,8 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["llm", "ai", "prompt", "builder", "chain", "zod"],
-  "author": "",
+  "keywords": ["llm", "ai", "prompt", "orchestration", "structured-output", "zod", "typescript"],
+  "author": "Onur Acar",
   "license": "MIT",
   "files": [
     "dist"
