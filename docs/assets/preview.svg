@@ -1,0 +1,23 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" rx="26" fill="#101418"/>
+  <rect x="54" y="52" width="1092" height="526" rx="20" fill="#17212B" stroke="#2D3B48"/>
+  <text x="86" y="116" fill="#F8FAFC" font-family="Segoe UI, Arial" font-size="42" font-weight="700">LLM Conductor</text>
+  <text x="86" y="154" fill="#94A3B8" font-family="Segoe UI, Arial" font-size="20">Prompt history, provider adapters, structured output</text>
+  <g font-family="Segoe UI, Arial" font-size="18" font-weight="700">
+    <rect x="86" y="234" width="190" height="82" rx="14" fill="#2563EB"/>
+    <text x="132" y="284" fill="white">Prompt</text>
+    <rect x="338" y="234" width="190" height="82" rx="14" fill="#7C3AED"/>
+    <text x="386" y="284" fill="white">History</text>
+    <rect x="590" y="234" width="190" height="82" rx="14" fill="#059669"/>
+    <text x="636" y="284" fill="white">Schema</text>
+    <rect x="842" y="234" width="230" height="82" rx="14" fill="#D97706"/>
+    <text x="894" y="284" fill="white">Provider</text>
+  </g>
+  <path d="M286 275H326" stroke="#94A3B8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M538 275H578" stroke="#94A3B8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M790 275H830" stroke="#94A3B8" stroke-width="4" stroke-linecap="round"/>
+  <rect x="86" y="388" width="986" height="102" rx="14" fill="#0F172A" stroke="#334155"/>
+  <text x="120" y="431" fill="#BAE6FD" font-family="Consolas, monospace" font-size="22">conductor.system(...).user(...).withSchema(z.object(...)).run()</text>
+  <text x="120" y="468" fill="#86EFAC" font-family="Consolas, monospace" font-size="20">typed result = OpenAI | Anthropic | Gemini</text>
+  <text x="86" y="544" fill="#94A3B8" font-family="Segoe UI, Arial" font-size="18">A small TypeScript layer for AI product workflows that need repeatable structure.</text>
+</svg>

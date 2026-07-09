@@ -2,32 +2,30 @@
 
 Type-safe orchestration for multi-provider LLM workflows.
 
-LLM Conductor is a small TypeScript library for building AI flows that need provider switching, conversation history, and structured outputs without rewriting the same glue code for every model API.
+<img src="./docs/assets/preview.svg" alt="LLM Conductor workflow preview">
 
-## Why It Exists
+LLM Conductor is a TypeScript library for AI features that need clean prompt composition, conversation history, provider switching, and structured output validation.
 
-AI apps often start simple, then quickly need the same patterns again and again:
+## Why This Exists
 
-- keep `system`, `user`, and `assistant` messages in order
-- switch between OpenAI, Anthropic, and Gemini
-- ask for structured JSON and validate it safely
-- keep the calling code readable as prompts grow
+AI products often start with one provider call, then quickly grow into repeated infrastructure:
 
-LLM Conductor wraps those concerns in one fluent interface.
+- prompt chains and system messages
+- conversation state
+- provider-specific request formats
+- structured JSON response parsing
+- Zod schemas for runtime safety
+
+LLM Conductor turns that glue code into one fluent interface.
 
 ## Highlights
 
-- Provider-oriented architecture for OpenAI, Anthropic, and Gemini
-- Fluent prompt builder for system and user messages
-- Conversation history management
+- Fluent `system().user().run()` workflow
+- Provider abstraction for OpenAI, Anthropic, and Gemini
 - Zod-backed structured output support
-- TypeScript-first package with ESM, CJS, and declaration builds
-
-## Install
-
-```bash
-npm install llm-conductor zod
-```
+- TypeScript types for package consumers
+- ESM, CJS, and declaration builds
+- Vitest coverage for core conductor behavior
 
 ## Example
 
@@ -35,7 +33,7 @@ npm install llm-conductor zod
 import { Conductor } from "llm-conductor";
 import { z } from "zod";
 
-const ProfileSchema = z.object({
+const CandidateSchema = z.object({
   name: z.string(),
   role: z.string(),
   strengths: z.array(z.string()),
@@ -46,18 +44,25 @@ const conductor = new Conductor({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const profile = await conductor
-  .system("You create concise candidate profiles.")
-  .user("Create a profile for a junior full-stack developer.")
-  .withSchema(ProfileSchema)
+const candidate = await conductor
+  .system("You write concise engineering candidate summaries.")
+  .user("Create a profile for a junior AI/full-stack developer.")
+  .withSchema(CandidateSchema)
   .run();
 
-console.log(profile.strengths);
+console.log(candidate.strengths);
 ```
 
-## Project Status
+## Architecture
 
-This is an early portfolio/library project. The core API, provider abstraction, tests, and build pipeline are in place; the next valuable improvements are broader provider test doubles, streaming support, and more examples.
+```text
+Conductor
+  -> message/history builder
+  -> optional Zod schema conversion
+  -> provider adapter
+  -> model response
+  -> parsed string or typed object
+```
 
 ## Development
 
@@ -67,10 +72,14 @@ npm test
 npm run build
 ```
 
+## Current Status
+
+This is an early library project with the core API, provider abstraction, tests, and build pipeline in place. The next strong improvements are streaming support, provider test doubles, and richer examples.
+
 ## Recent Hardening
 
 Schema conversion now fails loudly when the installed Zod version cannot expose JSON Schema conversion, instead of silently returning an empty schema.
 
-## License
+## Author
 
-MIT
+Onur Acar - <https://github.com/onuracar-dev>
