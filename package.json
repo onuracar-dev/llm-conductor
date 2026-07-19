@@ -1,37 +1,85 @@
 {
   "name": "llm-conductor",
-  "version": "1.0.0",
-  "description": "Type-safe orchestration for multi-provider LLM workflows.",
+  "version": "1.1.0",
+  "description": "A small, type-safe TypeScript adapter for OpenAI, Anthropic, Gemini, and custom LLM providers.",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.examples.json && tsc --noEmit -p tsconfig.tests.json",
     "test": "vitest run",
+    "test:watch": "vitest",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-    "prepublishOnly": "npm run build"
+    "check": "npm run typecheck && npm test && npm run build",
+    "prepack": "npm run check",
+    "prepublishOnly": "npm run check"
   },
-  "keywords": ["llm", "ai", "prompt", "orchestration", "structured-output", "zod", "typescript"],
+  "keywords": [
+    "llm",
+    "ai",
+    "openai",
+    "anthropic",
+    "gemini",
+    "prompt",
+    "streaming",
+    "tool-calling",
+    "structured-output",
+    "zod",
+    "typescript"
+  ],
   "author": "Onur Acar",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onuracar-dev/llm-conductor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/onuracar-dev/llm-conductor/issues"
+  },
+  "homepage": "https://llm-conductor-zrl4ko.v2.appdeploy.ai/",
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": false,
   "files": [
-    "dist"
+    "dist",
+    "docs/assets",
+    "examples",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "README.md",
+    "SECURITY.md"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
   "type": "module",
   "dependencies": {
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "tsup": "^8.2.0",
+    "tsup": "^8.5.1",
     "typescript": "~5.6.3",
-    "vitest": "^2.0.0"
+    "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "esbuild": "0.28.1"
   }
 }

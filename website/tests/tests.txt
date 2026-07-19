@@ -1,0 +1,28 @@
+# Tests
+
+## Test 1 - Product page and local stream lab work [sanity]
+Viewport: desktop (1280x800)
+Description: Verifies the product story loads and the core no-network streaming simulation reaches a durable result.
+Steps:
+1. Navigate to the app
+2. Confirm the hero heading, then scroll to "Route lab" and select "OpenAI"
+3. Activate "Run local stream" and wait for completion
+Expected: The lab shows "Complete", rendered response text, a done event, and token usage without requesting an API key.
+
+## Test 2 - App-owned failover remains explicit
+Viewport: desktop (1280x800)
+Description: Verifies the interactive fallback model is visible application logic and not presented as an SDK default.
+Steps:
+1. Navigate directly to the "Route lab" section
+2. Select "Anthropic" and activate the "App-owned fallback" routing policy
+3. Activate "Run fallback demo" and wait for completion
+Expected: The lab records a retryable Anthropic failure, an explicit app_fallback route to Gemini, a complete normalized stream, and a notice that the SDK does not fail over automatically.
+
+## Test 3 - Mobile navigation and security boundary are operable
+Viewport: mobile (375x667)
+Description: Verifies collapsed navigation reaches the provider and client-secret guardrails on a narrow screen.
+Steps:
+1. Navigate to the app
+2. Activate the "Open navigation menu" control
+3. Confirm all links are visible and activate the "Parity" link
+Expected: The menu closes, Parity is visible without horizontal scrolling, and the page states that provider keys stay in trusted server environments.
