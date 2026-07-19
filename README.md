@@ -4,7 +4,7 @@ Type-safe orchestration for text conversations across OpenAI, Anthropic, Gemini,
 
 <img src="./docs/assets/preview.svg" alt="LLM Conductor workflow preview">
 
-[Live website](https://llm-conductor-zrl4ko.v2.appdeploy.ai/) · [GitHub repository](https://github.com/onuracar-dev/llm-conductor)
+[Live website](https://llm-conductor.onuracar.dev/) · [GitHub repository](https://github.com/onuracar-dev/llm-conductor)
 
 LLM Conductor keeps a deliberately small API surface: compose a conversation, select a provider, optionally request structured output or tools, then run or stream it. It uses direct HTTP requests and has only one runtime dependency, Zod.
 
