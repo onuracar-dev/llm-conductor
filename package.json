@@ -49,7 +49,7 @@
   "bugs": {
     "url": "https://github.com/onuracar-dev/llm-conductor/issues"
   },
-  "homepage": "https://llm-conductor-zrl4ko.v2.appdeploy.ai/",
+  "homepage": "https://llm-conductor.onuracar-work.workers.dev/",
   "engines": {
     "node": ">=18"
   },
