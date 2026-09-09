@@ -298,6 +298,9 @@ export class AnthropicProvider implements LLMProvider {
           const text = asString(delta.text) ?? "";
           content += text;
           if (text) yield { type: "text_delta", delta: text, raw: event };
+        } else if (delta?.type === "thinking_delta") {
+          const thinking = asString(delta.thinking) ?? "";
+          if (thinking) yield { type: "reasoning_delta", delta: thinking, raw: event };
         } else if (delta?.type === "input_json_delta") {
           const argumentsDelta = asString(delta.partial_json) ?? "";
           const current = calls.get(index) ?? {

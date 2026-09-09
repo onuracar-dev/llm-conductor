@@ -1,18 +1,58 @@
 # LLM Conductor
 
-Type-safe orchestration for text conversations across OpenAI, Anthropic, Gemini, and custom providers.
+Type-safe LLM orchestration and sovereign desktop AI coding harness across OpenAI, Anthropic, Gemini, and local providers.
 
-<img src="./docs/assets/preview.svg" alt="LLM Conductor workflow preview">
+<p align="center">
+  <img src="./docs/assets/app-preview.png" alt="LLM Conductor Desktop App & Orchestration Engine" width="100%">
+</p>
 
-[Live website](https://llm-conductor.onuracar.dev/) · [GitHub repository](https://github.com/onuracar-dev/llm-conductor)
+<p align="center">
+  <a href="https://github.com/onuracar-dev/llm-conductor"><strong>GitHub Repository</strong></a> · 
+  <a href="#desktop-app--sovereign-harness"><strong>Desktop App</strong></a> · 
+  <a href="#quick-start"><strong>Quick Start</strong></a>
+</p>
 
-LLM Conductor keeps a deliberately small API surface: compose a conversation, select a provider, optionally request structured output or tools, then run or stream it. It uses direct HTTP requests and has only one runtime dependency, Zod.
+---
 
-## What it provides
+## ⚡ What is LLM Conductor?
+
+LLM Conductor is both a **lightweight TypeScript orchestration library** and a **sovereign desktop AI harness (Rust / Tauri v2)** designed for developers who want uncompromising control, zero telemetry, and maximum execution speed.
+
+- **As a Library:** Ultra-lightweight (single runtime dependency: `Zod`), normalized streaming, structured outputs, multi-provider adapters, automatic retry with jitter, and type-safe tool declarations.
+- **As a Desktop App:** A high-craft, Apple/Dieter Rams-inspired workspace harness that runs at ~40 MB RAM with native file access, inline diff visualizers, and groundbreaking web automation capabilities.
+
+---
+
+## 🚀 Key Innovations & Capabilities
+
+### 1. 🥇 Chrome Session Tethering (Zero-Login / Zero-CAPTCHA)
+Tethers directly to your existing Chrome profile via CDP. The AI navigates Google, GitHub, X, and enterprise portals while **already logged in**, eliminating CAPTCHAs, 2FA prompts, and authentication friction entirely.
+
+### 2. ⚡ Network-First Reverse Scraping
+Instead of fragile, token-heavy DOM parsing, Conductor intercepts raw REST and GraphQL JSON payloads directly from browser RAM (`Network.getResponseBody`). Complex pages yield structured data in under 10ms with zero prompt token bloat.
+
+### 3. 🛡️ Dry-Run Pre-Flight Sandbox
+Safeguards your accounts: mutating HTTP requests (`POST`, `PUT`, `DELETE`, `PATCH`) can be paused in mid-flight (`Fetch.requestPaused`) for instant user approval before any external side effects take place.
+
+### 4. 🤝 Co-Pilot Collision Avoidance
+Live human-in-the-loop coordination: the embedded Ghost Cursor detects physical human mouse or keyboard input instantly, smoothly yields control, and resumes autonomous execution only after you release the controls.
+
+### 5. 📺 Interactive Live Browser & Vision Lightbox
+Watch agent navigation live within Conductor via a 60 FPS viewport with bidirectional click-forwarding, or inspect pixel-perfect screenshots in an expanded, full-screen lightbox.
+
+### 6. 🔌 Custom MCP Protocol (HTTP/SSE & stdio)
+Plug-and-play Model Context Protocol client. Add custom MCP servers via remote HTTP/SSE links or local stdio CLI commands with real-time tool discovery and autonomous dispatch.
+
+### 7. 🍏 Anti-AI-Slop & High-Craft Aesthetics
+Built on strict Dieter Rams and Apple Human Interface Guidelines: monochromatic zinc typography, hairline borders (`border-black/[0.08] dark:border-white/[0.08]`), tactile micro-haptics (`apple-tap`), and a radial wave dark/light mode reveal.
+
+---
+
+## What the Library Provides
 
 - Fluent `system().user().run()` API with conversation history
 - OpenAI Chat Completions, Anthropic Messages, and Gemini Generate Content adapters
-- Zod-validated structured output
+- Zod-validated structured output with strict runtime guarantees
 - Normalized text, tool calls, token usage, finish reason, request ID, and raw provider data
 - Normalized streaming events across all built-in providers
 - Timeout, `AbortSignal`, exponential retry, jitter, and `Retry-After` support
@@ -26,6 +66,18 @@ npm install llm-conductor zod
 ```
 
 Node.js 18 or newer is supported. Other runtimes must provide standards-compatible `fetch`, `AbortController`, `ReadableStream`, and `TextDecoder` implementations. Do not put provider API keys in browser-delivered code.
+
+### Desktop App & Sovereign Harness
+
+To run the sovereign desktop application locally:
+
+```bash
+# Install workspace and desktop dependencies
+npm run install:all
+
+# Launch Tauri v2 desktop environment with native Rust IPC
+npm run desktop:dev
+```
 
 ## Quick start
 
