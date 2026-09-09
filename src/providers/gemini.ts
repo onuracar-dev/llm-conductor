@@ -106,14 +106,61 @@ function requestBody(
     throw configurationError("Structured output and user tools cannot be requested in the same Gemini call.");
   }
 
+  const model = resolveModel("gemini", options, requestOptions);
+  const isReasoningGemini =
+    model.includes("3.") ||
+    model.includes("gemini-3") ||
+    model.includes("flash") ||
+    model.includes("pro");
+
+  const resolvedMaxTokens =
+    requestOptions?.maxTokens !== undefined || options.maxTokens !== undefined
+      ? Math.max(resolveMaxTokens(options, requestOptions), isReasoningGemini ? 65536 : 8192)
+      : (isReasoningGemini ? 65536 : 8192);
+
+  const generationConfig: Record<string, unknown> = {
+    temperature: resolveTemperature(options, requestOptions),
+    maxOutputTokens: resolvedMaxTokens,
+  };
+
+  if (isReasoningGemini) {
+    const effort = requestOptions?.reasoningEffort ?? options.reasoningEffort;
+    const isGemini3 = model.includes("3.") || model.includes("gemini-3");
+
+    if (isGemini3) {
+      const thinkingLevel =
+        effort === "none"
+          ? "minimal"
+          : effort === "high"
+          ? "high"
+          : effort === "medium"
+          ? "medium"
+          : "low";
+
+      generationConfig.thinkingConfig = {
+        thinkingLevel,
+        includeThoughts: true,
+      };
+    } else {
+      const thinkingBudget =
+        effort === "none"
+          ? 0
+          : effort === "low"
+          ? 2048
+          : effort === "medium"
+          ? 8192
+          : -1;
+
+      generationConfig.thinkingConfig = {
+        thinkingBudget,
+        includeThoughts: true,
+      };
+    }
+  }
+
   const body: Record<string, unknown> = {
     contents: geminiMessages(messages),
-    generationConfig: {
-      temperature: resolveTemperature(options, requestOptions),
-      ...(requestOptions?.maxTokens !== undefined || options.maxTokens !== undefined
-        ? { maxOutputTokens: resolveMaxTokens(options, requestOptions) }
-        : {}),
-    },
+    generationConfig,
   };
   const system = messages
     .filter((message) => message.role === "system")
@@ -157,12 +204,17 @@ function usageFrom(value: unknown): TokenUsage | undefined {
   });
 }
 
-function partsContent(partsValue: unknown, startIndex = 0): { text: string; toolCalls: ToolCall[] } {
+function partsContent(partsValue: unknown, startIndex = 0): { text: string; reasoning: string; toolCalls: ToolCall[] } {
   let text = "";
+  let reasoning = "";
   const toolCalls: ToolCall[] = [];
   for (const [offset, partValue] of asArray(partsValue).entries()) {
     const part = asRecord(partValue);
-    text += asString(part?.text) ?? "";
+    if (part?.thought === true) {
+      reasoning += asString(part?.text) ?? "";
+    } else {
+      text += asString(part?.text) ?? "";
+    }
     const call = asRecord(part?.functionCall);
     if (call) {
       const name = asString(call.name) ?? `tool_${startIndex + offset}`;
@@ -179,11 +231,13 @@ function partsContent(partsValue: unknown, startIndex = 0): { text: string; tool
       });
     }
   }
-  return { text, toolCalls };
+  return { text, reasoning, toolCalls };
 }
 
 function endpoint(options: ConductorOptions, requestOptions: RunOptions | undefined, streaming: boolean): string {
-  const model = encodeURIComponent(resolveModel("gemini", options, requestOptions));
+  const rawModel = resolveModel("gemini", options, requestOptions);
+  const cleanModel = rawModel.replace(/^models\//, "");
+  const model = encodeURIComponent(cleanModel);
   const action = streaming ? "streamGenerateContent?alt=sse" : "generateContent";
   return joinURL(resolveBaseURL("gemini", options), `models/${model}:${action}`);
 }
@@ -273,6 +327,9 @@ export class GeminiProvider implements LLMProvider {
       finishReason = asString(candidate?.finishReason) ?? finishReason;
       const contentRecord = asRecord(candidate?.content);
       const parsed = partsContent(contentRecord?.parts, toolCalls.length);
+      if (parsed.reasoning) {
+        yield { type: "reasoning_delta", delta: parsed.reasoning, raw: event };
+      }
       if (parsed.text) {
         content += parsed.text;
         yield { type: "text_delta", delta: parsed.text, raw: event };

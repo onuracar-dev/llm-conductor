@@ -142,6 +142,7 @@ interface AttemptSignal {
   signal: AbortSignal;
   cleanup: () => void;
   timedOut: () => boolean;
+  heartbeat: () => void;
 }
 
 function createAttemptSignal(external: AbortSignal | undefined, timeoutMs: number): AttemptSignal {
@@ -155,16 +156,26 @@ function createAttemptSignal(external: AbortSignal | undefined, timeoutMs: numbe
     external?.addEventListener("abort", abortFromExternal, { once: true });
   }
 
-  const timer = timeoutMs > 0
-    ? setTimeout(() => {
+  let timer: ReturnType<typeof setTimeout> | undefined = undefined;
+
+  const armTimer = () => {
+    if (timer) clearTimeout(timer);
+    if (timeoutMs > 0) {
+      timer = setTimeout(() => {
         timeoutTriggered = true;
         controller.abort(new Error(`Request timed out after ${timeoutMs}ms.`));
-      }, timeoutMs)
-    : undefined;
+      }, timeoutMs);
+    }
+  };
+
+  armTimer();
 
   return {
     signal: controller.signal,
     timedOut: () => timeoutTriggered,
+    heartbeat: () => {
+      armTimer();
+    },
     cleanup: () => {
       if (timer) clearTimeout(timer);
       external?.removeEventListener("abort", abortFromExternal);
@@ -324,7 +335,10 @@ export async function requestJson<T>(context: RequestContext): Promise<JsonHttpR
   }
 }
 
-async function* decodeSSE(response: Response): AsyncGenerator<SSEMessage> {
+async function* decodeSSE(
+  response: Response,
+  attemptSignal?: AttemptSignal,
+): AsyncGenerator<SSEMessage> {
   if (!response.body) {
     throw new ConductorError("The provider returned an empty streaming body.", {
       code: "STREAM_ERROR",
@@ -354,6 +368,7 @@ async function* decodeSSE(response: Response): AsyncGenerator<SSEMessage> {
   try {
     while (true) {
       const { value, done } = await reader.read();
+      attemptSignal?.heartbeat();
       buffer += decoder.decode(value, { stream: !done }).replace(/\r\n/g, "\n");
       let boundary = buffer.indexOf("\n\n");
       while (boundary !== -1) {
@@ -380,7 +395,7 @@ async function* decodeSSE(response: Response): AsyncGenerator<SSEMessage> {
 export async function* requestSSE(context: RequestContext): AsyncGenerator<SSEMessage> {
   const { response, attemptSignal } = await openResponse(context);
   try {
-    yield* decodeSSE(response);
+    yield* decodeSSE(response, attemptSignal);
   } catch (error) {
     if (isConductorError(error)) throw error;
     if (attemptSignal.timedOut()) {

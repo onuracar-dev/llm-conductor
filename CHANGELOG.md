@@ -13,7 +13,7 @@ This project follows Semantic Versioning.
 - Custom adapters plus injectable `fetch`, base URL, headers, and per-request model options.
 - Normalized `ConductorError` values.
 - Timeout, caller `AbortSignal`, exponential backoff, jitter, and `Retry-After` handling.
-- Provider-focused mock coverage, integration examples, security policy, CI, and product website.
+- Provider-focused mock coverage, integration examples, security policy, CI, and sovereign desktop harness.
 
 ### Changed
 

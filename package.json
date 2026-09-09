@@ -18,11 +18,13 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean && node scripts/build-cloudflare-website.mjs",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.examples.json && tsc --noEmit -p tsconfig.tests.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "desktop:dev": "npm --prefix desktop run tauri dev",
+    "desktop:build": "npm --prefix desktop run tauri build",
     "check": "npm run typecheck && npm test && npm run build",
     "prepack": "npm run check",
     "prepublishOnly": "npm run check"
@@ -49,7 +51,7 @@
   "bugs": {
     "url": "https://github.com/onuracar-dev/llm-conductor/issues"
   },
-  "homepage": "https://llm-conductor.onuracar.dev/",
+  "homepage": "https://github.com/onuracar-dev/llm-conductor#readme",
   "engines": {
     "node": ">=18"
   },
