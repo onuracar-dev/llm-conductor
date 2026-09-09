@@ -235,6 +235,10 @@ export class OpenAIProvider implements LLMProvider {
       if (!choice) continue;
       finishReason = asString(choice.finish_reason) ?? finishReason;
       const delta = asRecord(choice.delta);
+      const reasoning = asString(delta?.reasoning_content ?? delta?.reasoning);
+      if (reasoning) {
+        yield { type: "reasoning_delta", delta: reasoning, raw: event };
+      }
       const text = asString(delta?.content);
       if (text) {
         content += text;

@@ -77,6 +77,8 @@ export interface SharedConductorOptions {
   /** Per-attempt timeout in milliseconds. Defaults to 30 seconds. */
   timeoutMs?: number;
   retry?: RetryOptions;
+  /** Controls thinking budget / reasoning level for reasoning models. */
+  reasoningEffort?: "low" | "medium" | "high" | "none";
 }
 
 export interface BuiltInConductorOptions extends SharedConductorOptions {
@@ -102,6 +104,7 @@ export interface RunOptions {
   headers?: Record<string, string>;
   tools?: readonly ToolDefinition[];
   toolChoice?: ToolChoice;
+  reasoningEffort?: "low" | "medium" | "high" | "none";
 }
 
 export interface ProviderResponse<T = unknown> {
@@ -121,6 +124,12 @@ export interface ProviderResponse<T = unknown> {
 
 export interface TextDeltaEvent {
   type: "text_delta";
+  delta: string;
+  raw?: unknown;
+}
+
+export interface ReasoningDeltaEvent {
+  type: "reasoning_delta";
   delta: string;
   raw?: unknown;
 }
@@ -147,6 +156,7 @@ export interface StreamDoneEvent<T = unknown> {
 
 export type ProviderStreamEvent<T = unknown> =
   | TextDeltaEvent
+  | ReasoningDeltaEvent
   | ToolCallDeltaEvent
   | UsageEvent
   | StreamDoneEvent<T>;

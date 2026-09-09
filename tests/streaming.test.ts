@@ -201,4 +201,82 @@ describe("normalized provider streaming", () => {
     await iterator.return?.();
     expect(cancel).toHaveBeenCalledTimes(1);
   });
+
+  it("streams reasoning deltas for DeepSeek-R1, Claude 3.7 thinking, and Gemini thought parts", async () => {
+    // OpenAI / DeepSeek reasoning_content
+    const openaiFetch = vi.fn().mockResolvedValue(sseResponse([
+      { data: { choices: [{ delta: { reasoning_content: "Let me think..." } }] } },
+      { data: { choices: [{ delta: { content: "Here is the answer." } }] } },
+      { data: "[DONE]" },
+    ]));
+    const openaiConductor = new Conductor({
+      provider: "openai",
+      apiKey: "key",
+      fetch: asFetch(openaiFetch),
+      retry: { maxRetries: 0 },
+    }).user("solve this");
+
+    const openaiEvents = await collectStream(openaiConductor.stream());
+    expect(openaiEvents.filter((e) => e.type === "reasoning_delta")).toEqual([
+      { type: "reasoning_delta", delta: "Let me think...", raw: expect.anything() },
+    ]);
+    expect(openaiEvents.filter((e) => e.type === "text_delta")).toEqual([
+      { type: "text_delta", delta: "Here is the answer.", raw: expect.anything() },
+    ]);
+
+    // Anthropic thinking_delta
+    const anthropicFetch = vi.fn().mockResolvedValue(sseResponse([
+      {
+        event: "content_block_delta",
+        data: { type: "content_block_delta", index: 0, delta: { type: "thinking_delta", thinking: "Analyzing..." } },
+      },
+      {
+        event: "content_block_delta",
+        data: { type: "content_block_delta", index: 1, delta: { type: "text_delta", text: "Done!" } },
+      },
+      { event: "message_stop", data: { type: "message_stop" } },
+    ]));
+    const anthropicConductor = new Conductor({
+      provider: "anthropic",
+      apiKey: "key",
+      fetch: asFetch(anthropicFetch),
+      retry: { maxRetries: 0 },
+    }).user("think");
+
+    const anthropicEvents = await collectStream(anthropicConductor.stream());
+    expect(anthropicEvents.filter((e) => e.type === "reasoning_delta")).toEqual([
+      { type: "reasoning_delta", delta: "Analyzing...", raw: expect.anything() },
+    ]);
+
+    // Gemini thought part
+    const geminiFetch = vi.fn().mockResolvedValue(sseResponse([
+      {
+        data: {
+          candidates: [{
+            content: {
+              parts: [
+                { text: "Gemini thinking step", thought: true },
+                { text: "Gemini final answer" },
+              ],
+            },
+          }],
+        },
+      },
+    ]));
+    const geminiConductor = new Conductor({
+      provider: "gemini",
+      apiKey: "key",
+      fetch: asFetch(geminiFetch),
+      retry: { maxRetries: 0 },
+    }).user("hello gemini");
+
+    const geminiEvents = await collectStream(geminiConductor.stream());
+    expect(geminiEvents.filter((e) => e.type === "reasoning_delta")).toEqual([
+      { type: "reasoning_delta", delta: "Gemini thinking step", raw: expect.anything() },
+    ]);
+    expect(geminiEvents.filter((e) => e.type === "text_delta")).toEqual([
+      { type: "text_delta", delta: "Gemini final answer", raw: expect.anything() },
+    ]);
+  });
 });
+

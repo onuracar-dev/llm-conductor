@@ -297,11 +297,13 @@ export class Conductor<T = string> {
       && (!Number.isInteger(options.maxTokens) || options.maxTokens <= 0)) {
       throw configurationError("`maxTokens` must be a positive integer.");
     }
-    if (!options && !tools && !toolChoice) return undefined;
+    const reasoningEffort = options?.reasoningEffort ?? this.options.reasoningEffort;
+    if (!options && !tools && !toolChoice && !reasoningEffort) return undefined;
     return {
       ...options,
       ...(tools ? { tools } : {}),
       ...(toolChoice ? { toolChoice } : {}),
+      ...(reasoningEffort ? { reasoningEffort } : {}),
     };
   }
 
